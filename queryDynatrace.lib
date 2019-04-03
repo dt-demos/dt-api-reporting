@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# library file that can be shared across scripts
+
+# need to define variable outside a function so that it is global
+export METRICS_DATA=()
+
+# this function is used to get data by calling the dynatrace API
+# this will load collected data into an array variable: METRICS_DATA
+query_dynatrace() {
+
+    # configure time range values.  Just be consistant across metrics
+    export API_RELATIVE_TIME=day
+    export UNIX_START_TIMESTAMP=$(date -u -v1d +"%s")
+    export UNIX_END_TIMESTAMP=$(date -u +"%s")
+    export REPORT_START_TIME=$(date -u -v1d +"%m-%d-%Y %H:%M:%S %Z")
+    export REPORT_END_TIME=$(date -u +"%m-%d-%Y %H:%M:%S %Z")
+
+    echo "#################################################"
+    echo "Query Dynatrace API"
+    echo "#################################################"
+    echo "Gathering Problems Counts"
+    # https://www.dynatrace.com/support/help/extend-dynatrace/dynatrace-api/environment/problems-api/
+    # {"result":{"problems":[],"monitored":{"INFRASTRUCTURE":578,"SERVICE":35,"APPLICATION":6,"ENVIRONMENT":1}}}
+    export PROBLEM_SERVICE_COUNT=$(curl --silent -X GET \
+    "$DT_TENANT_URL/api/v1/problem/feed?impactLevel=SERVICE&relativeTime=$API_RELATIVE_TIME" \
+    -H 'Authorization: Api-Token '$DT_API_TOKEN \
+    -H 'Content-Type: application/json' \
+    -H 'cache-control: no-cache'\
+    | jq -r '.result.monitored.SERVICE')
+    export PROBLEM_INFRASTRUCTURE_COUNT=$(curl --silent -X GET \
+    "$DT_TENANT_URL/api/v1/problem/feed?impactLevel=INFRASTRUCTURE&relativeTime=$API_RELATIVE_TIME" \
+    -H 'Authorization: Api-Token '$DT_API_TOKEN \
+    -H 'Content-Type: application/json' \
+    -H 'cache-control: no-cache'\
+    | jq -r '.result.monitored.INFRASTRUCTURE')
+    export PROBLEM_APPLICATION_COUNT=$(curl --silent -X GET \
+    "$DT_TENANT_URL/api/v1/problem/feed?impactLevel=INFRASTRUCTURE&relativeTime=$API_RELATIVE_TIME" \
+    -H 'Authorization: Api-Token '$DT_API_TOKEN \
+    -H 'Content-Type: application/json' \
+    -H 'cache-control: no-cache'\
+    | jq -r '.result.monitored.APPLICATION')
+
+    echo "Gathering Topology Counts"
+    # https://www.dynatrace.com/support/help/extend-dynatrace/dynatrace-api/environment/topology-and-smartscape-api/
+    # applications
+    export APPLICATION_COUNT=$(curl --silent -X GET \
+    "$DT_TENANT_URL/api/v1/entity/applications" \
+    -H 'Authorization: Api-Token '$DT_API_TOKEN \
+    -H 'Content-Type: application/json' \
+    -H 'cache-control: no-cache' \
+    | jq -r '. | length')
+
+    # hosts
+    export HOST_COUNT=$(curl --silent -X GET \
+    "$DT_TENANT_URL/api/v1/entity/hosts" \
+    -H 'Authorization: Api-Token '$DT_API_TOKEN \
+    -H 'Content-Type: application/json' \
+    -H 'cache-control: no-cache' \
+    | jq -r '. | length')
+
+    # services
+    export SERVICE_COUNT=$(curl --silent -X GET \
+    "$DT_TENANT_URL/api/v1/entity/services" \
+    -H 'Authorization: Api-Token '$DT_API_TOKEN \
+    -H 'Content-Type: application/json' \
+    -H 'cache-control: no-cache' \
+    | jq -r '. | length')
+
+    echo "Gathering User Session Counts"
+    # https://www.dynatrace.com/support/help/extend-dynatrace/dynatrace-api/environment/user-session-api/
+    export USER_SESSION_COUNT=$(curl --silent -X GET \
+    "$DT_TENANT_URL/api/v1/userSessionQueryLanguage/table?startTimestamp=$UNIX_START_TIMESTAMP&endTimestamp=$UNIX_END_TIMESTAMP&query=select%20count%28%2A%29%20from%20usersession" \
+    -H 'Authorization: Api-Token '$DT_API_TOKEN \
+    | jq -r '.values[0][0]')
+
+    # if get no results, then replace null with zero
+    USER_SESSION_COUNT=${USER_SESSION_COUNT//null/0}
+
+    # save data into array
+    METRICS_DATA=("$HOST_COUNT" "$SERVICE_COUNT" "$APPLICATION_COUNT" "$PROBLEM_SERVICE_COUNT" "$PROBLEM_INFRASTRUCTURE_COUNT" "$PROBLEM_APPLICATION_COUNT" "$USER_SESSION_COUNT")
+}

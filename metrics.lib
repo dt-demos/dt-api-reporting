@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# library file that defines two string arrays as to allowing sharing of
+# same values across scripts
+# METRICS is the name of the timeseries metrics
+# METRICS_NAME must match the count and order of METRICS.  It is the display name of metric
+export METRICS=("entity.count.host" "entity.count.service" "entity.count.application" "count.user_session" "problem.count.service" "problem.count.application" "problem.count.infrastructure")
+export METRICS_NAME=("entity count host" "entity count service" "entity count application" "count user sessions" "problem count service" "problem count application" "problem count infrastructure");
