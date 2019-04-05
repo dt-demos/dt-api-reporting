@@ -27,19 +27,19 @@ query_dynatrace() {
     -H 'Authorization: Api-Token '$DT_API_TOKEN \
     -H 'Content-Type: application/json' \
     -H 'cache-control: no-cache'\
-    | jq -r '.result.monitored.SERVICE')
+    | jq -r '.result.problems | length')
     export PROBLEM_INFRASTRUCTURE_COUNT=$(curl --silent -X GET \
     "$DT_TENANT_URL/api/v1/problem/feed?impactLevel=INFRASTRUCTURE&relativeTime=$API_RELATIVE_TIME" \
     -H 'Authorization: Api-Token '$DT_API_TOKEN \
     -H 'Content-Type: application/json' \
     -H 'cache-control: no-cache'\
-    | jq -r '.result.monitored.INFRASTRUCTURE')
+    | jq -r '.result.problems | length')
     export PROBLEM_APPLICATION_COUNT=$(curl --silent -X GET \
-    "$DT_TENANT_URL/api/v1/problem/feed?impactLevel=INFRASTRUCTURE&relativeTime=$API_RELATIVE_TIME" \
+    "$DT_TENANT_URL/api/v1/problem/feed?impactLevel=APPLICATION&relativeTime=$API_RELATIVE_TIME" \
     -H 'Authorization: Api-Token '$DT_API_TOKEN \
     -H 'Content-Type: application/json' \
     -H 'cache-control: no-cache'\
-    | jq -r '.result.monitored.APPLICATION')
+    | jq -r '.result.problems | length')
 
     echo "Gathering Topology Counts"
     # https://www.dynatrace.com/support/help/extend-dynatrace/dynatrace-api/environment/topology-and-smartscape-api/
