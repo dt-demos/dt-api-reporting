@@ -28,7 +28,14 @@ To run this example:
 1. run ```./addDeviceData.sh``` - this script will first call the Dynatrace API to gather metrics and then publish then to the custom device.
 1. within Dynatrace, in the left side menu navigate to: 'Technologies'.   Then click on 'custom devices' and then click to view the new device
 1. It might take a minute for data to appear.
-1. configure cron to run ```./addDeviceData.sh``` once a day.
+
+Option to collect dacal
+1. Run the ```loopAddDeviceData.sh``` script. This will call the ```addDeviceData.sh``` in a loop. See comments in this script for running it in the background.
+2. You can also make a crontab entry to run the ```addDeviceData.sh``` script once a day. For example
+```
+# Run once a day at midnight
+0 0 * * * cd <your path>/dt-api-reporting && ./addDeviceData.sh && echo "Crontab called addDeviceData @ "`date` >> addDeviceData.log
+```
 
 To remove this example:
 1. run ```./deleteCustomMetrics.sh``` - this will remove all the custom metrics
