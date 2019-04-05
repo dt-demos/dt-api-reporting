@@ -65,7 +65,7 @@ add_one_metric_data()
         "group" : "Dyntrace Reporting",
         "favicon" : "'"$DEVICE_ICON"'",
         "unit" : "Count",
-        "type": "dynatrace",
+        "type": "custom",
         "properties" : {
             "Description": "Used to collect Dynatrace Adoption Metrics"    
         },

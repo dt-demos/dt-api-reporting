@@ -54,7 +54,7 @@ add_metric()
         "displayName" : "'"$2"'",
         "unit" : "Count",
         "types": [
-            "dynatrace"
+            "custom"
         ]
     }'
     echo ""
