@@ -11,7 +11,7 @@ Both examples use the ```queryDynatrace.lib``` to call the Dynatrace API to gath
 This example will generate a text report to the terminal that uses the Dynatrace API to gather metrics and 
 display them in the terminal. It will also generate CVS output that you can copy-n-paste into Excel.
 
-![Report Example](images/report.png?raw=true "Report Example")
+<img src="images/report.png" width="300"/>
 
 To run this example:
 1. Follow the instruction as described in the *Prerequisites Setup* section below 
@@ -23,13 +23,13 @@ NOTE: See "other files" section below for other files this script depends on
 
 This example will gather the same metrics as the report example above, but will publish it into a Dynatrace Custom device. 
 
-![Report Example](images/device_list.png?raw=true "Report Example")
+<img src="images/device_list.png" width="200"/>
 
-![Report Example](images/device.png?raw=true "Report Example")
+<img src="images/device.png" width="300"/>
 
 Once in a custom device, you can use the Dynatace Web to view metrics or make a customer dashboard.
 
-![Report Example](images/chart.png?raw=true "Report Example")
+<img src="images/chart.png" width="300"/>
 
 To run this example:
 1. Follow the instruction as described in the *Prerequisites Setup* section below 
