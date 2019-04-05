@@ -39,7 +39,7 @@ Option to collect dacal
 
 To remove this example:
 1. run ```./deleteCustomMetrics.sh``` - this will remove all the custom metrics
-1. within Dynatrace, in the left side menu navigate to: 'Technologies'.   Then click on 'custom devices'.  Then click the 'delete' button next to the custom device.
+1. the custom Device will automatically be removed after a few days once the device has no metric data
 
 # Other files
 
