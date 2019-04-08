@@ -11,9 +11,9 @@ query_dynatrace() {
 
     # configure time range values.  Just be consistant across metrics
     export API_RELATIVE_TIME=day
-    export UNIX_START_TIMESTAMP=$(date -u -v1d +"%s")
+    export UNIX_START_TIMESTAMP=$([ "$(uname)" = Linux ] && date -u --date="yesterday" +"%s" || date -u -v1d +"%s")
     export UNIX_END_TIMESTAMP=$(date -u +"%s")
-    export REPORT_START_TIME=$(date -u -v1d +"%m-%d-%Y %H:%M:%S %Z")
+    export REPORT_START_TIME=$([ "$(uname)" = Linux ] && date -u --date="yesterday" +"%m-%d-%Y %H:%M:%S %Z" || date -u -v1d +"%m-%d-%Y %H:%M:%S %Z")
     export REPORT_END_TIME=$(date -u +"%m-%d-%Y %H:%M:%S %Z")
 
     echo "#################################################"
