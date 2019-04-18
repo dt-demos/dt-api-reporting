@@ -11,8 +11,8 @@ query_dynatrace() {
 
     # configure time range values.  Just be consistant across metrics
     export API_RELATIVE_TIME=day
-    export UNIX_START_TIMESTAMP=$([ "$(uname)" = Linux ] && date -u --date="yesterday" +"%s" || date -u -v1d +"%s")
-    export UNIX_END_TIMESTAMP=$(date -u +"%s")
+    export UNIX_START_TIMESTAMP=$([ "$(uname)" = Linux ] && date -u --date="yesterday" +"%s%N" | cut -b1-13 || date -u -v-1d +"%s000")
+    export UNIX_END_TIMESTAMP=$(date -u +"%s%N" | cut -b1-13 || date -u -v-1d +"%s000")
     export REPORT_START_TIME=$([ "$(uname)" = Linux ] && date -u --date="yesterday" +"%m-%d-%Y %H:%M:%S %Z" || date -u -v1d +"%m-%d-%Y %H:%M:%S %Z")
     export REPORT_END_TIME=$(date -u +"%m-%d-%Y %H:%M:%S %Z")
 
@@ -45,7 +45,7 @@ query_dynatrace() {
     # https://www.dynatrace.com/support/help/extend-dynatrace/dynatrace-api/environment/topology-and-smartscape-api/
     # applications
     export APPLICATION_COUNT=$(curl --silent -X GET \
-    "$DT_TENANT_URL/api/v1/entity/applications" \
+    "$DT_TENANT_URL/api/v1/entity/applications?relativeTime=$API_RELATIVE_TIME" \
     -H 'Authorization: Api-Token '$DT_API_TOKEN \
     -H 'Content-Type: application/json' \
     -H 'cache-control: no-cache' \
@@ -53,7 +53,7 @@ query_dynatrace() {
 
     # hosts
     export HOST_COUNT=$(curl --silent -X GET \
-    "$DT_TENANT_URL/api/v1/entity/hosts" \
+    "$DT_TENANT_URL/api/v1/entity/infrastructure/hosts?relativeTime=$API_RELATIVE_TIME" \
     -H 'Authorization: Api-Token '$DT_API_TOKEN \
     -H 'Content-Type: application/json' \
     -H 'cache-control: no-cache' \
@@ -61,7 +61,7 @@ query_dynatrace() {
 
     # services
     export SERVICE_COUNT=$(curl --silent -X GET \
-    "$DT_TENANT_URL/api/v1/entity/services" \
+    "$DT_TENANT_URL/api/v1/entity/services?relativeTime=$API_RELATIVE_TIME" \
     -H 'Authorization: Api-Token '$DT_API_TOKEN \
     -H 'Content-Type: application/json' \
     -H 'cache-control: no-cache' \
