@@ -6,6 +6,25 @@ Both examples use the ```queryDynatrace.lib``` to call the Dynatrace API to gath
 * Dynatrace problem count and user session counts are for the last 24 hours from the time script is run
 * entity counts will be current for the time the script is run
 
+# Prerequisites Setup
+
+1. Install jquery utility -- [Windows/Mac](https://github.com/stedolan/jq/wiki/Installation) instructions or [Linux](https://stedolan.github.io/jq/download/)
+1. copy as *creds.sav* as *creds.json*
+1. Fill in your Dynatrace values
+```
+{
+  "dynatraceUrl": "https://{your tenant}.live.dynatrace.com",
+  "dynatraceApiToken": "",
+  "relativeTimeframe": "day",
+  "managementZone": ""
+}
+```
+NOTE: this example is the SaaS dynatrace URL. Other API URL formats include:
+* https://{your-domain}/e/{your-environment-id}
+* xyz123.dynatrace-managed.com
+* relative time frame can be any of the values listed in the "_comment" lines in the file
+* Managgement zone is null by default. Management zones are integers found in your dynatrace tenant URL when filtered on a management zone. The file inputParameters.lib will check the validity of a management zone before executing.
+
 ## EXAMPLE #1) Output to terminal and CSV
 
 This example will generate a text report to the terminal that uses the Dynatrace API to gather metrics and 
@@ -55,21 +74,8 @@ To remove this example:
 * *metrics.lib* - this scripts provides a report that uses the Dynatrace API to gather metrics
 * *queryDynatrace.lib* - this scripts provides a report that uses the Dynatrace API to gather metrics
 * *creds.sav* - template you can copy as *creds.json*.  Add your Dynatrace 
+* *inputParameters.lib* - creates epoch time in ms for relative time frame chosen and validates management zone
 
-# Prerequisites Setup
-
-1. Install jquery utility -- https://github.com/stedolan/jq/wiki/Installation
-1. copy as *creds.sav* as *creds.json*
-1. Fill in your Dynatrace values
-```
-{
-  "dynatraceUrl": "https://{your tenant}.live.dynatrace.com",
-  "dynatraceApiToken": ""
-}
-```
-NOTE: this example is the SaaS dynatrace URL. Other API URL formats include:
-* https://{your-domain}/e/{your-environment-id}
-* xyz123.dynatrace-managed.com
 
 # Additional resources
 * https://www.dynatrace.com/news/blog/register-custom-network-devices-smartscape-topology/

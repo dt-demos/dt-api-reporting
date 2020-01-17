@@ -1,0 +1,101 @@
+#!/bin/bash
+
+# this library collects timeframe and managementzones from the user. Defauls are:
+#	timeframe: 1 day
+#	managementzone: all
+# define variables outside function so they are global 
+
+export QUERY_PARAMETERS=()
+
+# load in the Dynatrace URL and API token
+export DT_TENANT_URL=$(cat creds.json | jq -r '.dynatraceUrl')
+export DT_API_TOKEN=$(cat creds.json | jq -r '.dynatraceApiToken')
+export reltimeframe=$(cat creds.json | jq -r '.relativeTimeframe')
+export mgtzone=$(cat creds.json | jq -r '.managementZone')
+
+get_queryParameters(){
+
+	####   set relative time parameter and epoch start/end time
+
+	if [ "$reltimeframe" == 'min' ]
+	then
+		modnix="1 min ago"
+		modosx=1M
+	elif [ "$reltimeframe" == '5mins' ]
+	then
+		modnix="5 min ago"
+		modosx=5M
+	elif [ "$reltimeframe" == '10mins' ]
+	then
+		modnix="10 min ago"
+		modosx=10M
+	elif [ "$reltimeframe" == '15mins' ]
+	then
+		modnix="15 min ago"
+		modosx=15M
+	elif [ "$reltimeframe" == '30mins' ]
+	then
+		modnix="30 min ago"
+		modosx=30M
+	elif [ "$reltimeframe" == 'hour' ]
+	then
+		modnix="1 hour ago"
+		modosx=1H
+	elif [ "$reltimeframe" == '2hours' ]
+	then
+		modnix="2 hours ago"
+		modosx=2H
+	elif [ "$reltimeframe" == '6hours' ]
+	then
+		modnix="6 hours ago"
+		modosx=6H
+	elif [ "$reltimeframe" == 'day' ]
+	then
+		modnix="yesterday"
+		modosx=1d
+	elif [ "$reltimeframe" == '3days' ]
+	then
+		modnix="3 days ago"
+		modosx=3d
+	else
+		echo "$reltimeframe in not a valid timeframe"
+		exit 1
+	fi
+
+
+	# Validate Management Zone
+	
+	if [ -z "$mgtzone" ]
+	then
+		echo "---- Continuing without Management Zone ----"
+		export MANAGEMENT_ZONE="$mgtzone"
+	else
+		export MANAGEMENT_ZONE_CHECK=$(curl --write-out %{http_code} --silent --output /dev/null -X GET \
+		"$DT_TENANT_URL/api/config/v1/managementZones/$mgtzone" \
+		-H 'Authorization: Api-Token '$DT_API_TOKEN \
+		-H 'Content-Type: application/json' \
+		-H 'cache-control: no-cache')
+	
+		if [ $MANAGEMENT_ZONE_CHECK == '200' ]
+		then
+			echo "---- Management Zone is valid ----"
+			export MANAGEMENT_ZONE="&managementZone=$mgtzone"
+		else
+			echo "!!!!  Management Zone check failed with https status code: $MANAGEMENT_ZONE_CHECK for zone: $mgtzone !!!!"
+			exit 1
+		fi
+	fi
+
+
+
+        export API_RELATIVE_TIME=$reltimeframe
+	export UNIX_START_TIMESTAMP=$([ "$(uname)" = Linux ] && date -u --date="$modnix" +"%s%N" | cut -b1-13 || date -u -v-$modosx +"%s000")
+	export UNIX_END_TIMESTAMP=$(date -u +"%s%N" | cut -b1-13 || date -u +"%s000") 
+	export REPORT_START_TIME=$([ "$(uname)" = Linux ] && date -u --date="$modnix" +"%m-%d-%Y %H:%M:%S %Z" || date -u -v-$modosx +"%m-%d-%Y %H:%M:%S %Z")
+	export REPORT_END_TIME=$(date -u +"%m-%d-%Y %H:%M:%S %Z")
+	
+
+	QUERY_PARAMETERS=("$API_RELATIVE_TIME" "$UNIX_START_TIMESTAMP" "$UNIX_END_TIMESTAMP" "$REPORT_START_TIME" "$REPORT_END_TIME" "$MANAGEMENT_ZONE")
+	
+	}
+

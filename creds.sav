@@ -1,4 +1,11 @@
 {
-    "dynatraceUrl": "DYNATRACE_URL_PLACEHOLDER",
-    "dynatraceApiToken": "DYNATRACE_API_TOKEN"
+        "dynatraceUrl": "DYNATRACE_URL_PLACEHOLDER",
+        "dynatraceApiToken": "DYNATRACE_API_TOKEN",
+        "_comment": "add report timeframe. Default is day. Valid options are",
+        "_comment": "min,5mins,10mins,15mins,30mins,hour,2hours,6hours,day,3days",
+        "relativeTimeframe": "day",
+        "_comment": "Default Management zone is null (all).",
+        "_comment": "to specify a management zone, input the integer ID like -7484340012512959101",
+        "managementZone": ""
 }
+
